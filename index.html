@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Molang's Ice Cream Truck - Cute Dual Controller</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Fredoka & Quicksand -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <!-- TensorFlow & Teachable Machine Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
     
+    <!-- Firebase SDK (v9 Compatibility Mode) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
@@ -22,14 +27,14 @@
                         quicksand: ['Quicksand', 'sans-serif'],
                     },
                     colors: {
-                        pastelBg: '#FFF0F5',
-                        cardPink: '#FFF5F8',
-                        borderPink: '#FFB6C1',
-                        mintGreen: '#E0F8E9',
-                        mintDark: '#2E8B57',
-                        softYellow: '#FFF9D6',
+                        iceBlueBg: '#F0F8FF',
+                        cardWhite: '#FFFFFF',
+                        skyBlue: '#A0C4FF',
+                        skyBlueDark: '#4A90E2',
+                        pastelPink: '#FFC6FF',
                         bubblegum: '#FF99C8',
-                        berryDark: '#6B4C5E'
+                        softYellow: '#FDFFB6',
+                        berryDark: '#4A4E69'
                     }
                 }
             }
@@ -38,8 +43,8 @@
     <style>
         body {
             font-family: 'Quicksand', sans-serif;
-            background-color: #FFF0F5;
-            background-image: radial-gradient(#FFC0CB 1.5px, transparent 1.5px), radial-gradient(#FFC0CB 1.5px, #FFF0F5 1.5px);
+            background-color: #F0F8FF;
+            background-image: radial-gradient(#A0C4FF 1.5px, transparent 1.5px), radial-gradient(#FFC6FF 1.5px, #F0F8FF 1.5px);
             background-size: 60px 60px;
             background-position: 0 0, 30px 30px;
         }
@@ -49,9 +54,9 @@
         }
 
         .active-btn {
-            background-color: #FF99C8 !important;
+            background-color: #A0C4FF !important;
             color: #ffffff !important;
-            box-shadow: 0 0 25px #FF99C8 !important;
+            box-shadow: 0 0 25px #A0C4FF !important;
             border-color: #FFFFFF !important;
             transform: scale(0.95);
         }
@@ -87,18 +92,18 @@
 
         /* Soft Neumorphic Card Shadows */
         .cute-shadow {
-            box-shadow: 0 12px 32px rgba(255, 182, 193, 0.4);
+            box-shadow: 0 12px 32px rgba(160, 196, 255, 0.3);
         }
 
-        /* Custom Scrollbar for cute aesthetic */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #FFF0F5;
+            background: #F0F8FF;
         }
         ::-webkit-scrollbar-thumb {
-            background: #FFB6C1;
+            background: #A0C4FF;
             border-radius: 10px;
         }
     </style>
@@ -106,85 +111,100 @@
 <body class="text-berryDark min-h-screen p-4 lg:p-8 flex flex-col justify-between relative overflow-x-hidden">
 
     <div class="w-full max-w-[1600px] mx-auto space-y-6 z-10">
-        <header class="relative w-full bg-white/90 backdrop-blur-md rounded-3xl p-6 border-4 border-borderPink cute-shadow flex flex-col md:flex-row justify-between items-center gap-4 overflow-hidden">
+        <!-- Header Section -->
+        <header class="relative w-full bg-white/95 backdrop-blur-md rounded-3xl p-6 border-4 border-skyBlue cute-shadow flex flex-col md:flex-row justify-between items-center gap-4 overflow-hidden">
+            <!-- Cream Drip Decor Top (White Cream) -->
             <div class="cream-drip">
                 <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                    <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="#FFF5F8" opacity="0.8"></path>
+                    <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="#F0F8FF" opacity="0.9"></path>
                 </svg>
             </div>
 
             <div class="flex items-center gap-4 z-10">
-                <div class="relative w-16 h-16 bg-softYellow rounded-full border-2 border-bubblegum flex items-center justify-center shadow-md animate-float">
+                <!-- Molang & Piu Piu Avatar Frame -->
+                <div class="relative w-16 h-16 bg-softYellow rounded-full border-3 border-skyBlue flex items-center justify-center shadow-md animate-float">
                     <span class="text-3xl" title="Molang & Piu Piu">🐰🐤</span>
                     <span class="absolute -top-1 -right-1 text-xs">🍦</span>
                 </div>
                 <div>
-                    <h1 class="text-2xl lg:text-3xl font-extrabold tracking-wide text-bubblegum drop-shadow-sm flex items-center gap-2">
+                    <h1 class="text-2xl lg:text-3xl font-extrabold tracking-wide text-skyBlueDark drop-shadow-sm flex items-center gap-2">
                         MOLANG'S ICE CREAM TRUCK 
-                        <i class="fas fa-ice-cream text-yellow-400"></i>
+                        <i class="fas fa-ice-cream text-pink-400"></i>
                     </h1>
                     <p class="text-berryDark/70 text-xs font-semibold mt-0.5">Dual Controller: Manual D-Pad Cone & AI Gesture Detection</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-3 w-full md:w-auto justify-end z-10">
-                <div id="mode-badge" class="px-4 py-2.5 rounded-2xl bg-softYellow border-2 border-yellow-300 text-xs font-bold text-amber-700 tracking-wider uppercase shadow-sm">
+                <!-- Mode Indicator Badge -->
+                <div id="mode-badge" class="px-4 py-2.5 rounded-2xl bg-blue-50 border-2 border-skyBlue text-xs font-bold text-skyBlueDark tracking-wider uppercase shadow-sm">
                     Mode: Manual D-Pad
                 </div>
 
-                <button onclick="toggleModal(true)" class="p-2.5 bg-pink-100 hover:bg-pink-200 text-pink-500 rounded-2xl border-2 border-pink-300 transition active:scale-95 shadow-sm" title="Pengaturan Firebase">
+                <!-- Firebase Config Modal Button -->
+                <button onclick="toggleModal(true)" class="p-2.5 bg-blue-50 hover:bg-blue-100 text-skyBlueDark rounded-2xl border-2 border-skyBlue transition active:scale-95 shadow-sm" title="Pengaturan Firebase">
                     <i class="fas fa-candy-cane text-lg"></i>
                 </button>
 
-                <button id="btn-connect" onclick="connectBluetooth()" class="px-5 py-2.5 bg-gradient-to-r from-bubblegum to-pink-400 hover:from-pink-400 hover:to-bubblegum text-white rounded-2xl font-bold text-xs shadow-md transition duration-200 active:scale-95 flex items-center gap-2 border-2 border-white">
+                <!-- Bluetooth Connection Button -->
+                <button id="btn-connect" onclick="connectBluetooth()" class="px-5 py-2.5 bg-gradient-to-r from-skyBlue to-skyBlueDark hover:from-skyBlueDark hover:to-skyBlue text-white rounded-2xl font-bold text-xs shadow-md transition duration-200 active:scale-95 flex items-center gap-2 border-2 border-white">
                     <i class="fab fa-bluetooth-b text-sm"></i>
                     <span id="ble-btn-text">Hubungkan Micro:bit</span>
                 </button>
             </div>
         </header>
 
+        <!-- Main Grid Layout -->
         <main class="w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
             
-            <section class="bg-white/90 backdrop-blur-md rounded-3xl p-6 lg:p-8 border-4 border-borderPink cute-shadow flex flex-col items-center justify-between min-h-[500px] relative">
-                <div class="absolute top-3 left-4 text-xl opacity-60">🍓</div>
-                <div class="absolute top-3 right-4 text-xl opacity-60">🍒</div>
+            <!-- KOLOM 1: JOYSTICK D-PAD CONTROLLER -->
+            <section class="bg-white/95 backdrop-blur-md rounded-3xl p-6 lg:p-8 border-4 border-skyBlue cute-shadow flex flex-col items-center justify-between min-h-[500px] relative">
+                <!-- Decorative Toppings -->
+                <div class="absolute top-3 left-4 text-xl opacity-60">🫐</div>
+                <div class="absolute top-3 right-4 text-xl opacity-60">🍦</div>
 
                 <div class="w-full flex justify-between items-center mb-2 z-10">
-                    <h2 class="text-lg font-bold text-bubblegum flex items-center gap-2">
-                        <i class="fas fa-gamepad text-pink-400"></i> D-Pad Sweet Controls
+                    <h2 class="text-lg font-bold text-skyBlueDark flex items-center gap-2">
+                        <i class="fas fa-gamepad text-skyBlue"></i> D-Pad Sweet Controls
                     </h2>
-                    <span class="text-xs font-semibold text-berryDark/60 bg-pink-50 px-3 py-1 rounded-full border border-pink-200">Klik/Tahan untuk Jalan</span>
+                    <span class="text-xs font-semibold text-berryDark/60 bg-blue-50 px-3 py-1 rounded-full border border-skyBlue/50">Klik/Tahan untuk Jalan</span>
                 </div>
 
-                <div class="relative w-72 h-72 sm:w-[320px] sm:h-[320px] rounded-full bg-cardPink border-4 border-pink-200 shadow-[inner_0_0_20px_rgba(255,182,193,0.5)] flex items-center justify-center p-4 my-auto">
+                <!-- Ring D-Pad Container (Blue & White Soft Ice Cream Theme) -->
+                <div class="relative w-72 h-72 sm:w-[320px] sm:h-[320px] rounded-full bg-blue-50 border-4 border-skyBlue shadow-[inner_0_0_20px_rgba(160,196,255,0.4)] flex items-center justify-center p-4 my-auto">
                     
                     <div class="grid grid-cols-3 gap-3 w-full h-full p-2 select-none z-10">
                         <div></div>
-                        <button id="bt-up" class="dpad-btn group relative w-full h-full bg-white rounded-t-full border-3 border-pink-300 shadow-md flex flex-col items-center justify-center text-pink-400 hover:bg-pink-100 transition">
+                        <!-- BUTTON ATAS -->
+                        <button id="bt-up" class="dpad-btn group relative w-full h-full bg-white rounded-t-full border-3 border-skyBlue shadow-md flex flex-col items-center justify-center text-skyBlueDark hover:bg-blue-100 transition">
                             <i class="fas fa-chevron-up text-2xl group-hover:-translate-y-1 transition-transform"></i>
                             <span class="text-[9px] font-bold tracking-widest mt-1 uppercase text-berryDark/70">MAJU</span>
                         </button>
                         <div></div>
 
-                        <button id="bt-left" class="dpad-btn group relative w-full h-full bg-white rounded-l-full border-3 border-pink-300 shadow-md flex flex-col items-center justify-center text-pink-400 hover:bg-pink-100 transition">
+                        <!-- BUTTON KIRI -->
+                        <button id="bt-left" class="dpad-btn group relative w-full h-full bg-white rounded-l-full border-3 border-skyBlue shadow-md flex flex-col items-center justify-center text-skyBlueDark hover:bg-blue-100 transition">
                             <i class="fas fa-chevron-left text-2xl group-hover:-translate-x-1 transition-transform"></i>
                             <span class="text-[9px] font-bold tracking-widest mt-1 uppercase text-berryDark/70">KIRI</span>
                         </button>
 
+                        <!-- PUSAT STATUS (Molang Icon Center) -->
                         <div class="flex items-center justify-center">
-                            <div class="w-14 h-14 rounded-full bg-softYellow border-4 border-white flex items-center justify-center shadow-md relative">
+                            <div class="w-14 h-14 rounded-full bg-white border-4 border-skyBlue flex items-center justify-center shadow-md relative">
                                 <span class="text-xl">🐰</span>
                                 <div id="status-dot" class="absolute -bottom-1 -right-1 w-4 h-4 bg-red-400 rounded-full border-2 border-white shadow-sm transition-all"></div>
                             </div>
                         </div>
 
-                        <button id="bt-right" class="dpad-btn group relative w-full h-full bg-white rounded-r-full border-3 border-pink-300 shadow-md flex flex-col items-center justify-center text-pink-400 hover:bg-pink-100 transition">
+                        <!-- BUTTON KANAN -->
+                        <button id="bt-right" class="dpad-btn group relative w-full h-full bg-white rounded-r-full border-3 border-skyBlue shadow-md flex flex-col items-center justify-center text-skyBlueDark hover:bg-blue-100 transition">
                             <i class="fas fa-chevron-right text-2xl group-hover:translate-x-1 transition-transform"></i>
                             <span class="text-[9px] font-bold tracking-widest mt-1 uppercase text-berryDark/70">KANAN</span>
                         </button>
 
                         <div></div>
-                        <button id="bt-down" class="dpad-btn group relative w-full h-full bg-white rounded-b-full border-3 border-pink-300 shadow-md flex flex-col items-center justify-center text-pink-400 hover:bg-pink-100 transition">
+                        <!-- BUTTON BAWAH -->
+                        <button id="bt-down" class="dpad-btn group relative w-full h-full bg-white rounded-b-full border-3 border-skyBlue shadow-md flex flex-col items-center justify-center text-skyBlueDark hover:bg-blue-100 transition">
                             <span class="text-[9px] font-bold tracking-widest mb-1 uppercase text-berryDark/70">MUNDUR</span>
                             <i class="fas fa-chevron-down text-2xl group-hover:translate-y-1 transition-transform"></i>
                         </button>
@@ -192,38 +212,44 @@
                     </div>
                 </div>
 
-                <div class="w-full flex justify-between items-center text-xs font-semibold text-berryDark/70 border-t-2 border-pink-100 pt-4 mt-2">
+                <!-- Controller Info Footer -->
+                <div class="w-full flex justify-between items-center text-xs font-semibold text-berryDark/70 border-t-2 border-blue-50 pt-4 mt-2">
                     <span>Micro:bit BLE: <strong id="ble-status" class="text-red-400">Terputus ❌</strong></span>
                     <span>Firebase Sync: <strong id="fb-status" class="text-amber-500">Belum Terhubung 🍦</strong></span>
                 </div>
             </section>
 
-            <section class="bg-white/90 backdrop-blur-md rounded-3xl p-6 lg:p-8 border-4 border-borderPink cute-shadow flex flex-col items-center justify-between min-h-[500px] relative">
-                <div class="absolute top-3 left-4 text-xl opacity-60">🍫</div>
-                <div class="absolute top-3 right-4 text-xl opacity-60">🍌</div>
+            <!-- KOLOM 2: CAMERA HAND GESTURE RECOGNITION -->
+            <section class="bg-white/95 backdrop-blur-md rounded-3xl p-6 lg:p-8 border-4 border-skyBlue cute-shadow flex flex-col items-center justify-between min-h-[500px] relative">
+                <!-- Decorative Toppings -->
+                <div class="absolute top-3 left-4 text-xl opacity-60">🍓</div>
+                <div class="absolute top-3 right-4 text-xl opacity-60">🧊</div>
 
                 <div class="w-full flex justify-between items-center mb-2 z-10">
-                    <h2 class="text-lg font-bold text-bubblegum flex items-center gap-2">
-                        <i class="fas fa-camera-retro text-pink-400"></i> AI Hand Gesture Cam
+                    <h2 class="text-lg font-bold text-skyBlueDark flex items-center gap-2">
+                        <i class="fas fa-camera-retro text-skyBlue"></i> AI Hand Gesture Cam
                     </h2>
-                    <button id="btn-toggle-cam" onclick="toggleCamera()" class="px-4 py-2 bg-bubblegum hover:bg-pink-400 text-white font-bold rounded-2xl text-xs shadow-md transition active:scale-95 flex items-center gap-2 border-2 border-white">
+                    <!-- Toggle Switch AI Camera -->
+                    <button id="btn-toggle-cam" onclick="toggleCamera()" class="px-4 py-2 bg-skyBlueDark hover:bg-skyBlue text-white font-bold rounded-2xl text-xs shadow-md transition active:scale-95 flex items-center gap-2 border-2 border-white">
                         <i class="fas fa-power-off"></i>
                         <span id="cam-btn-text">Nyalakan Kamera</span>
                     </button>
                 </div>
 
-                <div class="relative w-full max-w-[280px] aspect-square rounded-3xl overflow-hidden border-4 border-pink-300 shadow-md bg-pink-50 flex flex-col items-center justify-center my-auto">
+                <!-- Camera Container -->
+                <div class="relative w-full max-w-[280px] aspect-square rounded-3xl overflow-hidden border-4 border-skyBlue shadow-md bg-blue-50 flex flex-col items-center justify-center my-auto">
                     <div id="webcam-container" class="w-full h-full flex items-center justify-center"></div>
-                    <div id="cam-placeholder" class="text-pink-300 flex flex-col items-center gap-2 p-4 text-center">
+                    <div id="cam-placeholder" class="text-skyBlue flex flex-col items-center gap-2 p-4 text-center">
                         <span class="text-4xl animate-bounce">🐤</span>
                         <span class="text-xs font-bold text-berryDark/60">Kamera Nonaktif<br>Piu Piu sedang bersiap!</span>
                     </div>
                 </div>
 
-                <div class="w-full border-t-2 border-pink-100 pt-4 mt-2">
+                <!-- Predictions Result Log -->
+                <div class="w-full border-t-2 border-blue-50 pt-4 mt-2">
                     <div class="text-[11px] text-berryDark/70 mb-2 font-bold flex justify-between">
                         <span>Akurasi Teachable Machine:</span>
-                        <span class="text-bubblegum">Prediksi Tertinggi = Aktif</span>
+                        <span class="text-skyBlueDark">Prediksi Tertinggi = Aktif</span>
                     </div>
                     <div id="label-container" class="grid grid-cols-2 gap-2 text-xs font-bold"></div>
                 </div>
@@ -232,22 +258,24 @@
         </main>
     </div>
 
-    <footer class="w-full max-w-[1600px] mx-auto mt-6 bg-white/90 backdrop-blur-md rounded-2xl p-4 border-4 border-borderPink cute-shadow flex justify-between items-center text-sm z-10">
+    <!-- Bottom Command Status Banner -->
+    <footer class="w-full max-w-[1600px] mx-auto mt-6 bg-white/95 backdrop-blur-md rounded-2xl p-4 border-4 border-skyBlue cute-shadow flex justify-between items-center text-sm z-10">
         <span class="text-berryDark/80 font-bold flex items-center gap-2">
             <span>🧁 Perintah Terkirim:</span>
         </span>
-        <div class="bg-softYellow px-6 py-1.5 rounded-2xl border-2 border-yellow-300 font-heading font-extrabold text-amber-800 text-base uppercase tracking-wider shadow-inner flex items-center gap-2">
+        <div class="bg-blue-50 px-6 py-1.5 rounded-2xl border-2 border-skyBlue font-heading font-extrabold text-skyBlueDark text-base uppercase tracking-wider shadow-inner flex items-center gap-2">
             <span id="last-cmd">STOP</span>
         </div>
     </footer>
 
-    <div id="fb-modal" class="fixed inset-0 bg-pink-900/40 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white border-4 border-borderPink rounded-3xl p-6 w-full max-w-md cute-shadow space-y-4 relative">
-            <div class="flex justify-between items-center border-b-2 border-pink-100 pb-3">
-                <h3 class="text-base font-bold text-bubblegum flex items-center gap-2">
-                    <i class="fas fa-cookie-bite text-yellow-500"></i> Konfigurasi Firebase
+    <!-- MODAL SETTING FIREBASE -->
+    <div id="fb-modal" class="fixed inset-0 bg-sky-900/30 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white border-4 border-skyBlue rounded-3xl p-6 w-full max-w-md cute-shadow space-y-4 relative">
+            <div class="flex justify-between items-center border-b-2 border-blue-50 pb-3">
+                <h3 class="text-base font-bold text-skyBlueDark flex items-center gap-2">
+                    <i class="fas fa-cookie-bite text-yellow-400"></i> Konfigurasi Firebase
                 </h3>
-                <button onclick="toggleModal(false)" class="text-pink-300 hover:text-pink-500">
+                <button onclick="toggleModal(false)" class="text-skyBlue hover:text-skyBlueDark">
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
@@ -255,19 +283,19 @@
             <div class="space-y-3">
                 <div>
                     <label class="block text-xs font-bold text-berryDark/70 mb-1">API Key</label>
-                    <input type="text" id="fb-api-key" placeholder="AIzaSy..." class="w-full bg-pink-50 border-2 border-pink-200 rounded-2xl px-3 py-2 text-xs text-berryDark font-semibold focus:outline-none focus:border-bubblegum">
+                    <input type="text" id="fb-api-key" placeholder="AIzaSy..." class="w-full bg-blue-50 border-2 border-skyBlue rounded-2xl px-3 py-2 text-xs text-berryDark font-semibold focus:outline-none focus:border-skyBlueDark">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-berryDark/70 mb-1">Database URL</label>
-                    <input type="text" id="fb-db-url" placeholder="https://your-app-default-rtdb.firebaseio.com" class="w-full bg-pink-50 border-2 border-pink-200 rounded-2xl px-3 py-2 text-xs text-berryDark font-semibold focus:outline-none focus:border-bubblegum">
+                    <input type="text" id="fb-db-url" placeholder="https://your-app-default-rtdb.firebaseio.com" class="w-full bg-blue-50 border-2 border-skyBlue rounded-2xl px-3 py-2 text-xs text-berryDark font-semibold focus:outline-none focus:border-skyBlueDark">
                 </div>
             </div>
 
             <div class="pt-2 flex justify-end gap-2">
-                <button onclick="toggleModal(false)" class="px-4 py-2 bg-pink-100 hover:bg-pink-200 text-berryDark font-bold text-xs rounded-2xl transition">
+                <button onclick="toggleModal(false)" class="px-4 py-2 bg-blue-50 hover:bg-blue-100 text-berryDark font-bold text-xs rounded-2xl transition">
                     Batal
                 </button>
-                <button onclick="initFirebase()" class="px-4 py-2 bg-gradient-to-r from-bubblegum to-pink-400 hover:from-pink-400 hover:to-bubblegum text-white font-bold text-xs rounded-2xl shadow-md transition border-2 border-white">
+                <button onclick="initFirebase()" class="px-4 py-2 bg-gradient-to-r from-skyBlue to-skyBlueDark hover:from-skyBlueDark hover:to-skyBlue text-white font-bold text-xs rounded-2xl shadow-md transition border-2 border-white">
                     Simpan & Connect
                 </button>
             </div>
@@ -444,9 +472,9 @@
 
             isAiMode = true;
             document.getElementById('cam-btn-text').innerText = "Matikan Kamera";
-            document.getElementById('btn-toggle-cam').classList.replace('bg-bubblegum', 'bg-red-400');
+            document.getElementById('btn-toggle-cam').classList.replace('bg-skyBlueDark', 'bg-red-400');
             document.getElementById('mode-badge').innerText = "Mode: AI Gesture";
-            document.getElementById('mode-badge').className = "px-4 py-2.5 rounded-2xl bg-bubblegum border-2 border-pink-300 text-xs font-bold text-white tracking-wider uppercase animate-bounce shadow-sm";
+            document.getElementById('mode-badge').className = "px-4 py-2.5 rounded-2xl bg-skyBlue border-2 border-white text-xs font-bold text-white tracking-wider uppercase animate-bounce shadow-sm";
 
             window.requestAnimationFrame(loop);
         } else {
@@ -457,9 +485,9 @@
             document.getElementById('label-container').innerHTML = "";
             
             document.getElementById('cam-btn-text').innerText = "Nyalakan Kamera";
-            document.getElementById('btn-toggle-cam').classList.replace('bg-red-400', 'bg-bubblegum');
+            document.getElementById('btn-toggle-cam').classList.replace('bg-red-400', 'bg-skyBlueDark');
             document.getElementById('mode-badge').innerText = "Mode: Manual D-Pad";
-            document.getElementById('mode-badge').className = "px-4 py-2.5 rounded-2xl bg-softYellow border-2 border-yellow-300 text-xs font-bold text-amber-700 tracking-wider uppercase shadow-sm";
+            document.getElementById('mode-badge').className = "px-4 py-2.5 rounded-2xl bg-blue-50 border-2 border-skyBlue text-xs font-bold text-skyBlueDark tracking-wider uppercase shadow-sm";
 
             resetButtons();
             sendToMicrobit("stop");
@@ -483,9 +511,9 @@
             const probability = prediction[i].probability;
 
             labelContainer.childNodes[i].innerHTML = 
-                `<div class="bg-pink-50 p-2 rounded-2xl border-2 border-pink-200 flex justify-between items-center">
+                `<div class="bg-blue-50 p-2 rounded-2xl border-2 border-skyBlue/60 flex justify-between items-center">
                     <span class="capitalize text-berryDark text-[11px]">${className}</span>
-                    <span class="font-bold text-bubblegum text-[11px]">${(probability * 100).toFixed(0)}%</span>
+                    <span class="font-bold text-skyBlueDark text-[11px]">${(probability * 100).toFixed(0)}%</span>
                  </div>`;
 
             if (probability > highestProb) {
