@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Molang's Ice Cream Truck - Cute Dual Controller</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        quicksand: ['Quicksand', 'sans-serif'],
+                    },
+                    colors: {
+                        pastelBg: '#FFF0F5',
+                        cardPink: '#FFF5F8',
+                        borderPink: '#FFB6C1',
+                        mintGreen: '#E0F8E9',
+                        mintDark: '#2E8B57',
+                        softYellow: '#FFF9D6',
+                        bubblegum: '#FF99C8',
+                        berryDark: '#6B4C5E'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #FFF0F5;
+            background-image: radial-gradient(#FFC0CB 1.5px, transparent 1.5px), radial-gradient(#FFC0CB 1.5px, #FFF0F5 1.5px);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+        }
+
+        h1, h2, h3, .font-heading {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .active-btn {
+            background-color: #FF99C8 !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 25px #FF99C8 !important;
+            border-color: #FFFFFF !important;
+            transform: scale(0.95);
+        }
+
+        /* SVG Cream Drip Header Overlay */
+        .cream-drip {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+            pointer-events: none;
+        }
+
+        .cream-drip svg {
+            position: relative;
+            display: block;
+            width: calc(100% + 1.3px);
+            height: 35px;
+        }
+
+        /* Cute Floating Animation */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(3deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Soft Neumorphic Card Shadows */
+        .cute-shadow {
+            box-shadow: 0 12px 32px rgba(255, 182, 193, 0.4);
+        }
+
+        /* Custom Scrollbar for cute aesthetic */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFF0F5;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FFB6C1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="text-berryDark min-h-screen p-4 lg:p-8 flex flex-col justify-between relative overflow-x-hidden">
+
+    <div class="w-full max-w-[1600px] mx-auto space-y-6 z-10">
+        <header class="relative w-full bg-white/90 backdrop-blur-md rounded-3xl p-6 border-4 border-borderPink cute-shadow flex flex-col md:flex-row justify-between items-center gap-4 overflow-hidden">
+            <div class="cream-drip">
+                <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                    <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="#FFF5F8" opacity="0.8"></path>
+                </svg>
+            </div>
+
+            <div class="flex items-center gap-4 z-10">
+                <div class="relative w-16 h-16 bg-softYellow rounded-full border-2 border-bubblegum flex items-center justify-center shadow-md animate-float">
+                    <span class="text-3xl" title="Molang & Piu Piu">🐰🐤</span>
+                    <span class="absolute -top-1 -right-1 text-xs">🍦</span>
+                </div>
+                <div>
+                    <h1 class="text-2xl lg:text-3xl font-extrabold tracking-wide text-bubblegum drop-shadow-sm flex items-center gap-2">
+                        MOLANG'S ICE CREAM TRUCK 
+                        <i class="fas fa-ice-cream text-yellow-400"></i>
+                    </h1>
+                    <p class="text-berryDark/70 text-xs font-semibold mt-0.5">Dual Controller: Manual D-Pad Cone & AI Gesture Detection</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3 w-full md:w-auto justify-end z-10">
+                <div id="mode-badge" class="px-4 py-2.5 rounded-2xl bg-softYellow border-2 border-yellow-300 text-xs font-bold text-amber-700 tracking-wider uppercase shadow-sm">
+                    Mode: Manual D-Pad
+                </div>
+
+                <button onclick="toggleModal(true)" class="p-2.5 bg-pink-100 hover:bg-pink-200 text-pink-500 rounded-2xl border-2 border-pink-300 transition active:scale-95 shadow-sm" title="Pengaturan Firebase">
+                    <i class="fas fa-candy-cane text-lg"></i>
+                </button>
+
+                <button id="btn-connect" onclick="connectBluetooth()" class="px-5 py-2.5 bg-gradient-to-r from-bubblegum to-pink-400 hover:from-pink-400 hover:to-bubblegum text-white rounded-2xl font-bold text-xs shadow-md transition duration-200 active:scale-95 flex items-center gap-2 border-2 border-white">
+                    <i class="fab fa-bluetooth-b text-sm"></i>
+                    <span id="ble-btn-text">Hubungkan Micro:bit</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <section class="bg-white/90 backdrop-blur-md rounded-3xl p-6 lg:p-8 border-4 border-borderPink cute-shadow flex flex-col items-center justify-between min-h-[500px] relative">
+                <div class="absolute top-3 left-4 text-xl opacity-60">🍓</div>
+                <div class="absolute top-3 right-4 text-xl opacity-60">🍒</div>
+
+                <div class="w-full flex justify-between items-center mb-2 z-10">
+                    <h2 class="text-lg font-bold text-bubblegum flex items-center gap-2">
+                        <i class="fas fa-gamepad text-pink-400"></i> D-Pad Sweet Controls
+                    </h2>
+                    <span class="text-xs font-semibold text-berryDark/60 bg-pink-50 px-3 py-1 rounded-full border border-pink-200">Klik/Tahan untuk Jalan</span>
+                </div>
+
+                <div class="relative w-72 h-72 sm:w-[320px] sm:h-[320px] rounded-full bg-cardPink border-4 border-pink-200 shadow-[inner_0_0_20px_rgba(255,182,193,0.5)] flex items-center justify-center p-4 my-auto">
+                    
+                    <div class="grid grid-cols-3 gap-3 w-full h-full p-2 select-none z-10">
+                        <div></div>
+                        <button id="bt-up" class="dpad-btn group relative w-full h-full bg-white rounded-t-full border-3 border-pink-300 shadow-md flex flex-col items-center justify-center text-pink-400 hover:bg-pink-100 transition">
+                            <i class="fas fa-chevron-up text-2xl group-hover:-translate-y-1 transition-transform"></i>
+                            <span class="text-[9px] font-bold tracking-widest mt-1 uppercase text-berryDark/70">MAJU</span>
+                        </button>
+                        <div></div>
+
+                        <button id="bt-left" class="dpad-btn group relative w-full h-full bg-white rounded-l-full border-3 border-pink-300 shadow-md flex flex-col items-center justify-center text-pink-400 hover:bg-pink-100 transition">
+                            <i class="fas fa-chevron-left text-2xl group-hover:-translate-x-1 transition-transform"></i>
+                            <span class="text-[9px] font-bold tracking-widest mt-1 uppercase text-berryDark/70">KIRI</span>
+                        </button>
+
+                        <div class="flex items-center justify-center">
+                            <div class="w-14 h-14 rounded-full bg-softYellow border-4 border-white flex items-center justify-center shadow-md relative">
+                                <span class="text-xl">🐰</span>
+                                <div id="status-dot" class="absolute -bottom-1 -right-1 w-4 h-4 bg-red-400 rounded-full border-2 border-white shadow-sm transition-all"></div>
+                            </div>
+                        </div>
+
+                        <button id="bt-right" class="dpad-btn group relative w-full h-full bg-white rounded-r-full border-3 border-pink-300 shadow-md flex flex-col items-center justify-center text-pink-400 hover:bg-pink-100 transition">
+                            <i class="fas fa-chevron-right text-2xl group-hover:translate-x-1 transition-transform"></i>
+                            <span class="text-[9px] font-bold tracking-widest mt-1 uppercase text-berryDark/70">KANAN</span>
+                        </button>
+
+                        <div></div>
+                        <button id="bt-down" class="dpad-btn group relative w-full h-full bg-white rounded-b-full border-3 border-pink-300 shadow-md flex flex-col items-center justify-center text-pink-400 hover:bg-pink-100 transition">
+                            <span class="text-[9px] font-bold tracking-widest mb-1 uppercase text-berryDark/70">MUNDUR</span>
+                            <i class="fas fa-chevron-down text-2xl group-hover:translate-y-1 transition-transform"></i>
+                        </button>
+                        <div></div>
+                    </div>
+                </div>
+
+                <div class="w-full flex justify-between items-center text-xs font-semibold text-berryDark/70 border-t-2 border-pink-100 pt-4 mt-2">
+                    <span>Micro:bit BLE: <strong id="ble-status" class="text-red-400">Terputus ❌</strong></span>
+                    <span>Firebase Sync: <strong id="fb-status" class="text-amber-500">Belum Terhubung 🍦</strong></span>
+                </div>
+            </section>
+
+            <section class="bg-white/90 backdrop-blur-md rounded-3xl p-6 lg:p-8 border-4 border-borderPink cute-shadow flex flex-col items-center justify-between min-h-[500px] relative">
+                <div class="absolute top-3 left-4 text-xl opacity-60">🍫</div>
+                <div class="absolute top-3 right-4 text-xl opacity-60">🍌</div>
+
+                <div class="w-full flex justify-between items-center mb-2 z-10">
+                    <h2 class="text-lg font-bold text-bubblegum flex items-center gap-2">
+                        <i class="fas fa-camera-retro text-pink-400"></i> AI Hand Gesture Cam
+                    </h2>
+                    <button id="btn-toggle-cam" onclick="toggleCamera()" class="px-4 py-2 bg-bubblegum hover:bg-pink-400 text-white font-bold rounded-2xl text-xs shadow-md transition active:scale-95 flex items-center gap-2 border-2 border-white">
+                        <i class="fas fa-power-off"></i>
+                        <span id="cam-btn-text">Nyalakan Kamera</span>
+                    </button>
+                </div>
+
+                <div class="relative w-full max-w-[280px] aspect-square rounded-3xl overflow-hidden border-4 border-pink-300 shadow-md bg-pink-50 flex flex-col items-center justify-center my-auto">
+                    <div id="webcam-container" class="w-full h-full flex items-center justify-center"></div>
+                    <div id="cam-placeholder" class="text-pink-300 flex flex-col items-center gap-2 p-4 text-center">
+                        <span class="text-4xl animate-bounce">🐤</span>
+                        <span class="text-xs font-bold text-berryDark/60">Kamera Nonaktif<br>Piu Piu sedang bersiap!</span>
+                    </div>
+                </div>
+
+                <div class="w-full border-t-2 border-pink-100 pt-4 mt-2">
+                    <div class="text-[11px] text-berryDark/70 mb-2 font-bold flex justify-between">
+                        <span>Akurasi Teachable Machine:</span>
+                        <span class="text-bubblegum">Prediksi Tertinggi = Aktif</span>
+                    </div>
+                    <div id="label-container" class="grid grid-cols-2 gap-2 text-xs font-bold"></div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <footer class="w-full max-w-[1600px] mx-auto mt-6 bg-white/90 backdrop-blur-md rounded-2xl p-4 border-4 border-borderPink cute-shadow flex justify-between items-center text-sm z-10">
+        <span class="text-berryDark/80 font-bold flex items-center gap-2">
+            <span>🧁 Perintah Terkirim:</span>
+        </span>
+        <div class="bg-softYellow px-6 py-1.5 rounded-2xl border-2 border-yellow-300 font-heading font-extrabold text-amber-800 text-base uppercase tracking-wider shadow-inner flex items-center gap-2">
+            <span id="last-cmd">STOP</span>
+        </div>
+    </footer>
+
+    <div id="fb-modal" class="fixed inset-0 bg-pink-900/40 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white border-4 border-borderPink rounded-3xl p-6 w-full max-w-md cute-shadow space-y-4 relative">
+            <div class="flex justify-between items-center border-b-2 border-pink-100 pb-3">
+                <h3 class="text-base font-bold text-bubblegum flex items-center gap-2">
+                    <i class="fas fa-cookie-bite text-yellow-500"></i> Konfigurasi Firebase
+                </h3>
+                <button onclick="toggleModal(false)" class="text-pink-300 hover:text-pink-500">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-berryDark/70 mb-1">API Key</label>
+                    <input type="text" id="fb-api-key" placeholder="AIzaSy..." class="w-full bg-pink-50 border-2 border-pink-200 rounded-2xl px-3 py-2 text-xs text-berryDark font-semibold focus:outline-none focus:border-bubblegum">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-berryDark/70 mb-1">Database URL</label>
+                    <input type="text" id="fb-db-url" placeholder="https://your-app-default-rtdb.firebaseio.com" class="w-full bg-pink-50 border-2 border-pink-200 rounded-2xl px-3 py-2 text-xs text-berryDark font-semibold focus:outline-none focus:border-bubblegum">
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end gap-2">
+                <button onclick="toggleModal(false)" class="px-4 py-2 bg-pink-100 hover:bg-pink-200 text-berryDark font-bold text-xs rounded-2xl transition">
+                    Batal
+                </button>
+                <button onclick="initFirebase()" class="px-4 py-2 bg-gradient-to-r from-bubblegum to-pink-400 hover:from-pink-400 hover:to-bubblegum text-white font-bold text-xs rounded-2xl shadow-md transition border-2 border-white">
+                    Simpan & Connect
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+    // --- MODAL TOGGLE ---
+    function toggleModal(show) {
+        const modal = document.getElementById('fb-modal');
+        if (show) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        } else {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
+    // --- 0. KONFIGURASI FIREBASE ---
+    let dbRef = null;
+
+    function initFirebase() {
+        const apiKey = document.getElementById('fb-api-key').value.trim();
+        const databaseURL = document.getElementById('fb-db-url').value.trim();
+
+        if (!apiKey || !databaseURL) {
+            alert("Harap isi API Key dan Database URL Firebase!");
+            return;
+        }
+
+        try {
+            const firebaseConfig = { apiKey, databaseURL };
+
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            } else {
+                firebase.app().delete().then(() => {
+                    firebase.initializeApp(firebaseConfig);
+                });
+            }
+
+            dbRef = firebase.database().ref('robot_control');
+            document.getElementById('fb-status').innerText = "Terhubung ✨";
+            document.getElementById('fb-status').className = "text-emerald-500 font-bold";
+            toggleModal(false);
+            alert("Berhasil terhubung ke Firebase!");
+        } catch(e) {
+            console.error("Firebase Init Error:", e);
+            document.getElementById('fb-status').innerText = "Gagal Konek ❌";
+            document.getElementById('fb-status').className = "text-red-400 font-bold";
+            alert("Gagal konek Firebase. Periksa API Key / Database URL.");
+        }
+    }
+
+    function sendToFirebase(command, mode) {
+        if (dbRef) {
+            dbRef.set({
+                command: command,
+                mode: mode,
+                timestamp: Date.now()
+            }).catch(err => console.error("Firebase Sync Error:", err));
+        }
+    }
+
+    // --- 1. CONFIG & GLOBALS ---
+    const MODEL_URL = "https://teachablemachine.withgoogle.com/models/mZ_Qhc9ZT/";
+    let model, webcam, labelContainer, maxPredictions;
+    let bluetoothDevice, uartTxCharacteristic;
+    let currentCommand = "stop";
+    let isAiMode = false;
+
+    const UART_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+    const UART_TX_CHARACTERISTIC_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
+
+    // --- 2. WEB BLUETOOTH INTEGRATION ---
+    async function connectBluetooth() {
+        try {
+            bluetoothDevice = await navigator.bluetooth.requestDevice({
+                filters: [{ namePrefix: 'BBC micro:bit' }],
+                optionalServices: [UART_SERVICE_UUID]
+            });
+
+            const server = await bluetoothDevice.gatt.connect();
+            const service = await server.getPrimaryService(UART_SERVICE_UUID);
+            uartTxCharacteristic = await service.getCharacteristic(UART_TX_CHARACTERISTIC_UUID);
+
+            document.getElementById('ble-status').innerText = "Terhubung ✨";
+            document.getElementById('ble-status').className = "text-emerald-500 font-bold";
+            document.getElementById('ble-btn-text').innerText = "Micro:bit Terhubung";
+            document.getElementById('status-dot').className = "absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-400 rounded-full border-2 border-white shadow-sm animate-pulse";
+        } catch (error) {
+            console.error("Bluetooth Gagal:", error);
+            alert("Gagal/Dibatalkan terhubung dengan micro:bit.");
+        }
+    }
+
+    function sendToMicrobit(command) {
+        if (currentCommand === command) return;
+        currentCommand = command;
+        document.getElementById('last-cmd').innerText = command;
+
+        sendToFirebase(command, isAiMode ? "AI_AUTOMATIC" : "MANUAL_JOYSTICK");
+
+        if (uartTxCharacteristic) {
+            const encoder = new TextEncoder();
+            uartTxCharacteristic.writeValue(encoder.encode(command + "\n"))
+                .catch(err => console.error("Bluetooth TX Error:", err));
+        }
+    }
+
+    // --- 3. D-PAD MANUAL JOYSTICK LOGIC ---
+    function setupManualJoystick() {
+        const buttons = {
+            'bt-up': 'up',
+            'bt-down': 'down',
+            'bt-left': 'left',
+            'bt-right': 'right'
+        };
+
+        Object.keys(buttons).forEach(id => {
+            const btn = document.getElementById(id);
+            const cmd = buttons[id];
+
+            const startPress = (e) => {
+                e.preventDefault();
+                if (!isAiMode) {
+                    highlightButton(id);
+                    sendToMicrobit(cmd);
+                }
+            };
+
+            const endPress = (e) => {
+                e.preventDefault();
+                if (!isAiMode) {
+                    resetButtons();
+                    sendToMicrobit("stop");
+                }
+            };
+
+            btn.addEventListener('mousedown', startPress);
+            btn.addEventListener('mouseup', endPress);
+            btn.addEventListener('mouseleave', endPress);
+            btn.addEventListener('touchstart', startPress);
+            btn.addEventListener('touchend', endPress);
+        });
+    }
+    setupManualJoystick();
+
+    // --- 4. TEACHABLE MACHINE AI CAMERA ---
+    async function toggleCamera() {
+        if (!isAiMode) {
+            document.getElementById('cam-btn-text').innerText = "Memuat AI...";
+            if (!model) {
+                const modelURL = MODEL_URL + "model.json";
+                const metadataURL = MODEL_URL + "metadata.json";
+                model = await tmImage.load(modelURL, metadataURL);
+                maxPredictions = model.getTotalClasses();
+            }
+
+            const flip = true;
+            webcam = new tmImage.Webcam(280, 280, flip);
+            await webcam.setup();
+            await webcam.play();
+
+            document.getElementById('cam-placeholder').style.display = "none";
+            document.getElementById('webcam-container').appendChild(webcam.canvas);
+
+            labelContainer = document.getElementById("label-container");
+            labelContainer.innerHTML = "";
+            for (let i = 0; i < maxPredictions; i++) {
+                labelContainer.appendChild(document.createElement("div"));
+            }
+
+            isAiMode = true;
+            document.getElementById('cam-btn-text').innerText = "Matikan Kamera";
+            document.getElementById('btn-toggle-cam').classList.replace('bg-bubblegum', 'bg-red-400');
+            document.getElementById('mode-badge').innerText = "Mode: AI Gesture";
+            document.getElementById('mode-badge').className = "px-4 py-2.5 rounded-2xl bg-bubblegum border-2 border-pink-300 text-xs font-bold text-white tracking-wider uppercase animate-bounce shadow-sm";
+
+            window.requestAnimationFrame(loop);
+        } else {
+            isAiMode = false;
+            if (webcam) webcam.stop();
+            document.getElementById('webcam-container').innerHTML = "";
+            document.getElementById('cam-placeholder').style.display = "flex";
+            document.getElementById('label-container').innerHTML = "";
+            
+            document.getElementById('cam-btn-text').innerText = "Nyalakan Kamera";
+            document.getElementById('btn-toggle-cam').classList.replace('bg-red-400', 'bg-bubblegum');
+            document.getElementById('mode-badge').innerText = "Mode: Manual D-Pad";
+            document.getElementById('mode-badge').className = "px-4 py-2.5 rounded-2xl bg-softYellow border-2 border-yellow-300 text-xs font-bold text-amber-700 tracking-wider uppercase shadow-sm";
+
+            resetButtons();
+            sendToMicrobit("stop");
+        }
+    }
+
+    async function loop() {
+        if (!isAiMode) return;
+        webcam.update();
+        await predict();
+        window.requestAnimationFrame(loop);
+    }
+
+    async function predict() {
+        const prediction = await model.predict(webcam.canvas);
+        let highestProb = 0;
+        let bestClass = "stop";
+
+        for (let i = 0; i < maxPredictions; i++) {
+            const className = prediction[i].className;
+            const probability = prediction[i].probability;
+
+            labelContainer.childNodes[i].innerHTML = 
+                `<div class="bg-pink-50 p-2 rounded-2xl border-2 border-pink-200 flex justify-between items-center">
+                    <span class="capitalize text-berryDark text-[11px]">${className}</span>
+                    <span class="font-bold text-bubblegum text-[11px]">${(probability * 100).toFixed(0)}%</span>
+                 </div>`;
+
+            if (probability > highestProb) {
+                highestProb = probability;
+                bestClass = className.toLowerCase();
+            }
+        }
+
+        if (highestProb < 0.65) bestClass = "stop";
+
+        if (bestClass.includes("atas") || bestClass.includes("up") || bestClass.includes("maju")) {
+            highlightButton('bt-up');
+            sendToMicrobit("up");
+        } else if (bestClass.includes("bawah") || bestClass.includes("down") || bestClass.includes("mundur")) {
+            highlightButton('bt-down');
+            sendToMicrobit("down");
+        } else if (bestClass.includes("kiri") || bestClass.includes("left")) {
+            highlightButton('bt-left');
+            sendToMicrobit("left");
+        } else if (bestClass.includes("kanan") || bestClass.includes("right")) {
+            highlightButton('bt-right');
+            sendToMicrobit("right");
+        } else {
+            resetButtons();
+            sendToMicrobit("stop");
+        }
+    }
+
+    // --- 5. UI HIGHLIGHT HELPER ---
+    function highlightButton(buttonId) {
+        resetButtons();
+        const btn = document.getElementById(buttonId);
+        if (btn) btn.classList.add('active-btn');
+    }
+
+    function resetButtons() {
+        ['bt-up', 'bt-down', 'bt-left', 'bt-right'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) btn.classList.remove('active-btn');
+        });
+    }
+</script>
+</body>
+</html>
